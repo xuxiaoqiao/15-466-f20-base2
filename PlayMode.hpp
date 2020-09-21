@@ -34,12 +34,12 @@ struct PlayMode : Mode {
 	glm::vec3 player_base_position;
 	glm::vec3 camera_base_position;
 
-	float wobble = 0.0f;
+	// float wobble = 0.0f;
 	float drot = 0.0f;
 	float dmov = 0.0f;
-	float stand = -1.0f; // 1 if standing
+	// float stand = -1.0f; // 1 if standing
 	bool moving = false;
-	int stance = 0;
+	int stance = 0; // 0 is along x axis, 1 is along y axis, 2 is along z axis
 
 	glm::vec3 dirx = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 diry = glm::vec3(0.0f, 1.0f, 0.0f);
@@ -47,7 +47,7 @@ struct PlayMode : Mode {
 
 	glm::vec3 axisx = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::vec3 axisy = glm::vec3(0.0f, 1.0f, 0.0f);
-	glm::vec3 axisz = glm::vec3(0.0f, 0.0f, 1.0f);
+	// glm::vec3 axisz = glm::vec3(0.0f, 0.0f, 1.0f);
 
 	// glm::vec3 axis = axisx;
 	

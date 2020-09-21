@@ -65,22 +65,26 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		// 	SDL_SetRelativeMouseMode(SDL_FALSE);
 		// 	return true;
 		// } 
-		moving = true;
+		
 		if (evt.key.keysym.sym == SDLK_a) {
 			left.downs += 1;
 			left.pressed = true;
+			moving = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_d) {
 			right.downs += 1;
 			right.pressed = true;
+			moving = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_w) {
 			up.downs += 1;
 			up.pressed = true;
+			moving = true;
 			return true;
 		} else if (evt.key.keysym.sym == SDLK_s) {
 			down.downs += 1;
 			down.pressed = true;
+			moving = true;
 			return true;
 		}
 	} 
@@ -149,11 +153,13 @@ void PlayMode::update(float elapsed) {
 
 			//combine inputs into a move:
 			constexpr float PlayerSpeed = 100.0f;
-			glm::vec2 move = glm::vec2(0.0f);
+			glm::vec3 move = glm::vec3(0.0f);
 			if (left.pressed && !right.pressed) move.x = -1.0f;
 			if (!left.pressed && right.pressed) move.x = 1.0f;
 			if (down.pressed && !up.pressed) move.y = -1.0f;
 			if (!down.pressed && up.pressed) move.y = 1.0f;
+
+			
 			//make it so that moving diagonally doesn't go faster:
 			// if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
@@ -195,26 +201,38 @@ void PlayMode::update(float elapsed) {
 					axisx
 				) * player_base_rotation;
 			}
+
+			if (stance == 0){
+				move.z = abs(move.x)*0.5;
+				move.x *= 1.5;
+			} else if (stance == 1){
+				move.z = abs(move.y)*0.5;
+				move.y *= 1.5;
+			} else if (stance == 2){
+				move.z = -0.5;
+				move.x *= 1.5;
+				move.y *= 1.5;
+			}
 			
-			player->position = player_base_position + dmov * dirx * move.x + dmov * diry * move.y - abs(dmov) * dirz * stand;
-			camera->transform->position = camera_base_position + dmov * dirx * move.x + dmov * diry * move.y - abs(dmov) * dirz * stand;
-			// player->position += move.x * dirx * 0.15f + abs(move.x) * dirz * stand * 0.1f;
-			// camera->transform->position += move.x * dirx * 0.15f + abs(move.x) * dirz * stand * 0.1f;
-			// player->position = glm::vec3(0.0f, move.x, 0.0f);
+			player->position = player_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
+			camera->transform->position = camera_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
 			
 			if (abs(dmov) == 1.0f){
 				drot = 0.0f;
-				// player_base_position = player_base_position + dmov * dirx * move.x - abs(dmov) * dirz * stand;
-				// camera_base_position = camera_base_position + dmov * dirx * move.x - abs(dmov) * dirz * stand;
+			
 				player_base_position = player->position;
 				camera_base_position = camera->transform->position;
-				// for (int i=0; i<4; i++){
-				// 	std::cout << (player->rotation)[i] << " ";
-				// }
-				// std::cout << std::endl;
-				// std::cout << "reset rotation" << std::endl;
 				player_base_rotation = player->rotation;
 				dmov = 0.0f;
+
+				if (stance == 0){
+					if (move.x != 0) stance = 2;
+				} else if (stance == 1){
+					if (move.y != 0) stance = 2;
+				} else if (stance == 2){
+					if (move.x != 0) stance = 0;
+					else if (move.y != 0) stance = 1;
+				}
 				left.pressed = false;
 				right.pressed = false;
 				down.pressed = false;
@@ -222,7 +240,8 @@ void PlayMode::update(float elapsed) {
 				
 				move.x = 0.0f;
 				move.y = 0.0f;
-				stand *= -1.0f;
+				move.z = 0.0f;
+				
 				moving = false;
 			}
 			
