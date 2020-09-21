@@ -35,7 +35,6 @@ struct PlayMode : Mode {
 	glm::vec3 camera_base_position;
 
 	float wobble = 0.0f;
-	float rot = 0.0f;
 	float drot = 0.0f;
 	float dmov = 0.0f;
 	float stand = -1.0f; // 1 if standing

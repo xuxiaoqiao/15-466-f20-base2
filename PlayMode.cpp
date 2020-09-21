@@ -185,15 +185,15 @@ void PlayMode::update(float elapsed) {
 			// 	stand = -1.0f;
 			// }
 			if (move.x != 0){
-				player->rotation = player_base_rotation * glm::angleAxis(
-					glm::radians((rot+drot)*move.x),
+				player->rotation = glm::angleAxis(
+					glm::radians(drot*move.x),
 					axisy
-				);
+				) * player_base_rotation;
 			} else if (move.y != 0){
-				player->rotation = player_base_rotation * glm::angleAxis(
-					glm::radians((rot+drot)*move.y),
+				player->rotation = glm::angleAxis(
+					glm::radians(drot*move.y),
 					axisx
-				);
+				) * player_base_rotation;
 			}
 			
 			player->position = player_base_position + dmov * dirx * move.x + dmov * diry * move.y - abs(dmov) * dirz * stand;
@@ -203,7 +203,6 @@ void PlayMode::update(float elapsed) {
 			// player->position = glm::vec3(0.0f, move.x, 0.0f);
 			
 			if (abs(dmov) == 1.0f){
-				rot += drot;
 				drot = 0.0f;
 				// player_base_position = player_base_position + dmov * dirx * move.x - abs(dmov) * dirz * stand;
 				// camera_base_position = camera_base_position + dmov * dirx * move.x - abs(dmov) * dirz * stand;
@@ -213,7 +212,8 @@ void PlayMode::update(float elapsed) {
 				// 	std::cout << (player->rotation)[i] << " ";
 				// }
 				// std::cout << std::endl;
-				// player_base_rotation = player->rotation;
+				// std::cout << "reset rotation" << std::endl;
+				player_base_rotation = player->rotation;
 				dmov = 0.0f;
 				left.pressed = false;
 				right.pressed = false;
