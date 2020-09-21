@@ -28,13 +28,29 @@ struct PlayMode : Mode {
 	Scene scene;
 
 	//hexapod leg to wobble:
-	Scene::Transform *hip = nullptr;
-	Scene::Transform *upper_leg = nullptr;
-	Scene::Transform *lower_leg = nullptr;
-	glm::quat hip_base_rotation;
-	glm::quat upper_leg_base_rotation;
-	glm::quat lower_leg_base_rotation;
+	Scene::Transform *player = nullptr;
+
+	glm::quat player_base_rotation;
+	glm::vec3 player_base_position;
+	glm::vec3 camera_base_position;
+
 	float wobble = 0.0f;
+	float rot = 0.0f;
+	float drot = 0.0f;
+	float dmov = 0.0f;
+	float stand = -1.0f; // 1 if standing
+	bool moving = false;
+	int stance = 0;
+
+	glm::vec3 dirx = glm::vec3(1.0f, 0.0f, 0.0f);
+	glm::vec3 diry = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 dirz = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	glm::vec3 axisx = glm::vec3(-1.0f, 0.0f, 0.0f);
+	glm::vec3 axisy = glm::vec3(0.0f, 1.0f, 0.0f);
+	glm::vec3 axisz = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	// glm::vec3 axis = axisx;
 	
 	//camera:
 	Scene::Camera *camera = nullptr;
