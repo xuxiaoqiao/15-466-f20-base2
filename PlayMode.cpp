@@ -290,7 +290,7 @@ bool PlayMode::update(float elapsed) {
 	// 	moving = false;
 	// }
 	constexpr float PlayerSpeed = 300.0f;
-	constexpr float PortalSpeed = 1.0f;
+	constexpr float PortalSpeed = 5.0f;
 	if (portaling){
 		dmov += elapsed*PortalSpeed;
 		dmov = std::min(dmov, 2.0f);
