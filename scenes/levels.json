@@ -12,7 +12,7 @@
     },
     "coins": [
       {
-        "position": [0, 0, 1],
+        "position": [0, 3, 0],
         "id": "coin1"
       },
       {
@@ -52,7 +52,7 @@
     },
     "coins": [
       {
-        "position": [6, 0, 2],
+        "position": [6, 0, 1],
         "id": "coin1"
       },
       {
