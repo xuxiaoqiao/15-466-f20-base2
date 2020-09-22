@@ -227,8 +227,11 @@ std::pair<glm::ivec3, glm::ivec3> PlayMode::next_pos(glm::ivec3 pos1, glm::ivec3
 
 bool PlayMode::offmap(std::pair<glm::ivec3, glm::ivec3> pos){
 	if (wall){
-		return false;
-		// if (level_map.right_wall.GetTileType(pos.first.y, pos.first.z) == 0 || level_map.right_wall.GetTileType(pos.second.y, pos.second.z) == 0) return true;
+//		return false;
+		assert(level_map.right_wall);
+		if (level_map.right_wall->GetTileType(pos.first.y, pos.first.z) == 0 ||
+			level_map.right_wall->GetTileType(pos.second.y, pos.second.z) == 0)
+			return true;
 	} else {
 		// return false;
 		
