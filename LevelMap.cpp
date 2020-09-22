@@ -10,8 +10,7 @@ extern const std::array<std::string, 2> roller_scene_names;
 
 static LevelMap::Plane parse_plane(const json &j);
 static LevelMap parse_level_map(const json &j);
-static glm::uvec3 parse_ivec3(const json &j);
-static glm::uvec3 parse_uvec3(const json &j);
+static glm::ivec3 parse_ivec3(const json &j);
 
 Load<std::vector<LevelMap>> roller_level_maps(LoadTagDefault, []() -> std::vector<LevelMap> const * {
     std::vector<LevelMap> *result = new std::vector<LevelMap>;
@@ -31,10 +30,10 @@ static LevelMap parse_level_map(const json &j) {
     if (j.contains("right_wall")) {
         right_wall = std::make_optional(parse_plane(j.at("right_wall")));
     }
-    std::vector<std::pair<glm::uvec3, std::string>> coins_pos;
+    std::vector<std::pair<glm::ivec3, std::string>> coins_pos;
     assert(j.at("coins").is_array());
     for (const auto &c : j.at("coins")) {
-        coins_pos.emplace_back(parse_uvec3(c.at("position")), c.at("id"));
+        coins_pos.emplace_back(parse_ivec3(c.at("position")), c.at("id"));
     }
     LevelMap::Player p;
     const json &player_json = j.at("player");
@@ -53,17 +52,8 @@ static LevelMap::Plane parse_plane(const json &j) {
     return p;
 }
 
-static glm::uvec3 parse_ivec3(const json &j) {
+static glm::ivec3 parse_ivec3(const json &j) {
     glm::ivec3 result;
-    assert(j.is_array());
-    result[0] = j.at(0);
-    result[1] = j.at(1);
-    result[2] = j.at(2);
-    return result;
-}
-
-static glm::uvec3 parse_uvec3(const json &j) {
-    glm::uvec3 result;
     assert(j.is_array());
     result[0] = j.at(0);
     result[1] = j.at(1);
