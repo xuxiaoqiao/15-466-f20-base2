@@ -35,7 +35,12 @@ static LevelMap parse_level_map(const json &j) {
     for (const auto &c : j.at("coins")) {
         coins_pos.emplace_back(parse_uvec3(c.at("position")), c.at("id"));
     }
-    return LevelMap(floor, right_wall, coins_pos);
+    LevelMap::Player p;
+    const json &player_json = j.at("player");
+    p.pos1 = parse_uvec3(player_json.at("pos1"));
+    p.pos2 = parse_uvec3(player_json.at("pos2"));
+    p.stance = player_json.at("stance");
+    return LevelMap(floor, right_wall, coins_pos, p);
 }
 
 
