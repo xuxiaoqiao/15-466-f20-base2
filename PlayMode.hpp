@@ -42,8 +42,8 @@ struct PlayMode : Mode {
 	glm::vec3 player_base_position;
 	glm::vec3 camera_base_position;
 
-	std::vector<int> pos{1,2,2,2};
-	std::vector<int> newpos{1,2,2,2};
+	std::vector<int> pos{1,2,0,2,2,0};
+	std::vector<int> newpos{1,2,0,2,2,0};
 
 	struct LevelMap {
 		struct Plane {
@@ -101,10 +101,10 @@ struct PlayMode : Mode {
 
 	glm::vec3 axisx = glm::vec3(-1.0f, 0.0f, 0.0f);
 	glm::vec3 axisy = glm::vec3(0.0f, 1.0f, 0.0f);
-	// glm::vec3 axisz = glm::vec3(0.0f, 0.0f, 1.0f);
+	glm::vec3 axisz = glm::vec3(0.0f, 0.0f, -1.0f);
 
 	// glm::vec3 axis = axisx;
-	
+	bool wall = false;
 	//camera:
 	Scene::Camera *camera = nullptr;
 
