@@ -34,8 +34,8 @@ struct LevelMap {
     };
 
     struct Player {
-        glm::uvec3 pos1;
-        glm::uvec3 pos2;
+        glm::ivec3 pos1;
+        glm::ivec3 pos2;
         int stance;
     };
 

@@ -19,11 +19,11 @@ struct PlayMode : Mode {
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
 	virtual void update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
-	bool offmap(std::pair<glm::uvec3, glm::uvec3> pos);
+	bool offmap(std::pair<glm::ivec3, glm::ivec3> pos);
 	void end_move();
 	void to_wall();
 	void to_floor();
-	std::pair<glm::uvec3, glm::uvec3> next_pos(glm::uvec3 pos1, glm::uvec3 pos2, glm::vec3 op);
+	std::pair<glm::ivec3, glm::ivec3> next_pos(glm::ivec3 pos1, glm::ivec3 pos2, glm::vec3 op);
 
 
 	//input tracking:
@@ -45,22 +45,17 @@ struct PlayMode : Mode {
 	glm::quat camera_base_rotation;
 	glm::vec3 camera_base_position;
 
-	glm::uvec3 pos1 = glm::uvec3(1,2,0);
-	glm::uvec3 pos2 = glm::uvec3(2,2,0);
-	std::pair<glm::uvec3, glm::uvec3> newpos;
+	glm::ivec3 pos1 = level_map.player.pos1;
+	glm::ivec3 pos2 = level_map.player.pos1;
+	std::pair<glm::ivec3, glm::ivec3> newpos;
 
 	// float wobble = 0.0f;
 	float drot = 0.0f;
 	float dmov = 0.0f;
 	// float stand = -1.0f; // 1 if standing
 	bool moving = false;
-	int stance = 0; // 0 is along x axis, 1 is along y axis, 2 is along z axis
+	int stance = level_map.player.stance; // 0 is along x axis, 1 is along y axis, 2 is along z axis
 
-<<<<<<< HEAD
-	int coinFound = 0;
-
-=======
->>>>>>> 56b857cdf9f36e79821037d116678dadcc1efbe5
 	glm::vec3 dirx = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 diry = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 dirz = glm::vec3(0.0f, 0.0f, 1.0f);

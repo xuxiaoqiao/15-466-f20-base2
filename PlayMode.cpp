@@ -183,7 +183,7 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	return false;
 }
 
-std::pair<glm::uvec3, glm::uvec3> PlayMode::next_pos(glm::uvec3 pos1, glm::uvec3 pos2, glm::vec3 op){
+std::pair<glm::ivec3, glm::ivec3> PlayMode::next_pos(glm::ivec3 pos1, glm::ivec3 pos2, glm::vec3 op){
 	if (op.x != 0) op.x /= abs(op.x);
 	if (op.y != 0) op.y /= abs(op.y);
 
@@ -226,11 +226,13 @@ std::pair<glm::uvec3, glm::uvec3> PlayMode::next_pos(glm::uvec3 pos1, glm::uvec3
 	return std::make_pair(pos1, pos2);
 }
 
-bool PlayMode::offmap(std::pair<glm::uvec3, glm::uvec3> pos){
+bool PlayMode::offmap(std::pair<glm::ivec3, glm::ivec3> pos){
 	if (wall){
 		return false;
 		// if (level_map.right_wall.GetTileType(pos.first.y, pos.first.z) == 0 || level_map.right_wall.GetTileType(pos.second.y, pos.second.z) == 0) return true;
 	} else {
+		// return false;
+		std::cout << pos.first.x << pos.first.y << pos.second.x << pos.second.y << std::endl;
 		if (level_map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || level_map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
 	}
 	return false;
@@ -308,7 +310,8 @@ void PlayMode::update(float elapsed) {
 					// return;
 				}
 			} else {
-				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed){
+				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed && level_map.right_wall.has_value()){
+					// std::cout << level_map.right_wall.has_value() << std::endl;
 					move.x = 0.0f;
 					rot_camera = -1.0f;
 					// end_move();
