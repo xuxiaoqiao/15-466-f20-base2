@@ -174,37 +174,56 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	return false;
 }
 
-void PlayMode::next_pos(glm::uvec3 pos1, glm::uvec3 pos2, glm::vec3 op){
-	// if (operation.x != 0) operation.x /= abs(operation.x);
-	// if (operation.y != 0) operation.y /= abs(operation.y);
+std::pair<glm::uvec3, glm::uvec3> PlayMode::next_pos(glm::uvec3 pos1, glm::uvec3 pos2, glm::vec3 op){
+	if (op.x != 0) op.x /= abs(op.x);
+	if (op.y != 0) op.y /= abs(op.y);
 
-	// if (stance == 0){
-	// 	pos1 -= operation.y * diry;
-	// 	pos2 -= operation.y * diry;
-	// 	pos1 += operation.x * dirx;
-		
-	// } else if (stance == 1){
-	// 	pos1.x += operation.x * dirx;
-	// 	pos2.x += operation.x * dirx;
-	// 	if (operation.y < 0){
-	// 		pos1.y = std::max(pos1.y, pos2.y) + 1;
-	// 		pos2.y = pos1.y;
-	// 	} else if (operation.y > 0){
-	// 		pos1.y = std::min(pos1.y, pos2.y) - 1;
-	// 		pos2.y = pos1.y;
-	// 	}
-	// } else if (stance == 2){
-	// 	pos[0] += operation.x;
-	// 	pos[1] -= operation.y;
-	// 	pos[3] += operation.x*2;
-	// 	pos[4] -= operation.y*2;
-	// }
+	if (stance == 0){
+		if (op.y != 0){
+			pos1 -= op.y * diry;
+			pos2 -= op.y * diry;
+		} else if (op.x != 0){
+			pos1 += op.x * dirx;
+			pos2 += op.x * 2 * dirx;
+			if (pos1.x != pos2.x || pos1.z != pos2.z){
+				pos1 -= op.x * dirx;
+				pos2 -= op.x * 2 * dirx;
+				pos2 += op.x * dirx;
+				pos1 += op.x * 2 * dirx;
+			}
+			pos1 += dirz;
+		}
+	} else if (stance == 1){
+		if (op.x != 0){
+			pos1 += op.x * dirx;
+			pos2 += op.x * dirx;
+		} else if (op.y > 0){
+			pos1.y = std::min(pos1.y, pos2.y) - 1;
+			pos2.y = pos1.y;
+			pos1 += dirz;
+		} else if (op.y < 0){
+			pos1.y = std::max(pos1.y, pos2.y) + 1;
+			pos2.y = pos1.y;
+			pos1 += dirz;
+		}
+	} else if (stance == 2){
+		pos1 += op.x * dirx;
+		pos1 -= op.y * diry;
+		pos2 += op.x * 2 * dirx;
+		pos2 -= op.y * 2 * diry;
+		pos1 -= dirz;
+	}
 
-	return;
+	return std::make_pair(pos1, pos2);
 }
 
-bool PlayMode::offmap(std::vector<int> pos){
-	// if (map.floor.GetTileType(pos[1], pos[0]) == 0 || map.floor.GetTileType(pos[3], pos[2]) == 0) return true;
+bool PlayMode::offmap(std::pair<glm::uvec3, glm::uvec3> pos){
+	if (wall){
+		return false;
+		// if (level_map.right_wall.GetTileType(pos.first.y, pos.first.z) == 0 || level_map.right_wall.GetTileType(pos.second.y, pos.second.z) == 0) return true;
+	} else {
+		if (level_map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || level_map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
+	}
 	return false;
 }
 
@@ -224,6 +243,13 @@ void PlayMode::to_wall(){
 	axisz = glm::vec3(1.0f, 0.0f, 0.0f);
 	if (stance == 0) stance = 2;
 	else if (stance == 2) stance = 0;
+	camera->transform->rotation = glm::angleAxis(
+					glm::radians(-90.0f),
+					axisy
+				) * camera->transform->rotation;
+	camera->transform->position.z -= 5;
+	camera->transform->position.x -= 5;
+	camera_base_position = camera->transform->position;
 }
 
 void PlayMode::to_floor(){
@@ -236,6 +262,13 @@ void PlayMode::to_floor(){
 
 	if (stance == 0) stance = 2;
 	else if (stance == 2) stance = 0;
+	camera->transform->rotation = glm::angleAxis(
+					glm::radians(90.0f),
+					axisy
+				) * camera->transform->rotation;
+	camera->transform->position.z += 5;
+	camera->transform->position.x += 5;
+	camera_base_position = camera->transform->position;
 }
 
 
@@ -270,12 +303,26 @@ void PlayMode::update(float elapsed) {
 			if (right.pressed) move.x = 1.0f;
 			if (down.pressed) move.y = -1.0f;
 			if (up.pressed) move.y = 1.0f;
+
+			if (wall){
+				if ((pos1.z == 0 || pos2.z == 0) && left.pressed){
+					to_floor();
+					end_move();
+					return;
+				}
+			} else {
+				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed){
+					to_wall();
+					end_move();
+					return;
+				}
+			}
 		
-			// newpos = next_pos(pos, move);
-			// if (offmap(newpos)){ //check map
-			// 	end_move();
-			// 	return;
-			// }
+			newpos = next_pos(pos1, pos2, move);
+			if (offmap(newpos)){ //check map
+				end_move();
+				return;
+			}
 			//make it so that moving diagonally doesn't go faster:
 			// if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
@@ -355,7 +402,8 @@ void PlayMode::update(float elapsed) {
 					if (move.x != 0) stance = 0;
 					else if (move.y != 0) stance = 1;
 				}
-				// pos = newpos;
+				pos1 = newpos.first;
+				pos2 = newpos.second;
 				end_move();
 			}
 			
