@@ -145,6 +145,8 @@ struct Scene {
 	//load a scene:
 	Scene(std::string const &filename, std::function< void(Scene &, Transform *, std::string const &) > const &on_drawable);
 
+    virtual ~Scene() = default;
+
 	//copy a scene (with proper pointer fixup):
 	Scene(Scene const &); //...as a constructor
 	Scene &operator=(Scene const &); //...as scene = scene
