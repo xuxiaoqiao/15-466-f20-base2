@@ -238,7 +238,7 @@ bool PlayMode::update(float elapsed) {
 			if (right.pressed) move.x = 1.0f;
 			if (down.pressed) move.y = -1.0f;
 			if (up.pressed) move.y = 1.0f;
-			int rot_camera = 0.0f;
+			float rot_camera = 0.0f;
 			if (wall){
 				if ((pos1.z == 0 || pos2.z == 0) && left.pressed){
 					move.x = 0.0f;
@@ -301,10 +301,10 @@ bool PlayMode::update(float elapsed) {
 					) * player_base_rotation;
 				}
 				if (stance == 0){
-					move.z = abs(move.x)*0.5;
+					move.z = abs(move.x)*0.5f;
 					move.x *= 1.5;
 				} else if (stance == 1){
-					move.z = abs(move.y)*0.5;
+					move.z = abs(move.y)*0.5f;
 					move.y *= 1.5;
 				} else if (stance == 2){
 					move.z = -0.5;
@@ -348,7 +348,7 @@ bool PlayMode::update(float elapsed) {
 	}
 	
 	//check if we collect coins
-	for(size_t i = 0; i<level_map.coins_pos.size();i++){
+	for(int i = 0; i<level_map.coins_pos.size();i++){
 		auto pos = collected_coins.find(i);
 		if (pos != collected_coins.end()){
 			continue;
