@@ -3,7 +3,8 @@
 #include "Scene.hpp"
 
 #include <glm/glm.hpp>
-#include <json.hpp>
+
+#include <array>
 
 #include <vector>
 #include <deque>
