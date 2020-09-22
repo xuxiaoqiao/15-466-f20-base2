@@ -76,8 +76,12 @@ Load<std::vector<Scene>> roller_scene_list(LoadTagDefault, []() -> std::vector<S
 PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 									level_map(roller_level_maps->at(level_idx)) {
 	//get pointers to leg for convenience:
+	coins_transforms.reserve(level_map.coins_pos.size());
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "player") player = &transform;
+		for(int i = 0; i < level_map.coins_pos.size();i++){
+			if (transform.name == level_map.coins_pos[i].second) coins_transforms[i] = &transform;
+		}
 	}
 
 	if (player == nullptr) throw std::runtime_error("player not found.");
@@ -331,6 +335,23 @@ void PlayMode::update(float elapsed) {
 		right.downs = 0;
 		up.downs = 0;
 		down.downs = 0;
+	}
+	
+	//check if we collect coins
+	for(int i = 0; i<level_map.coins_pos.size();i++){
+		if (c==pos1 || c == pos2){
+			coinFound = i;
+			break;
+		}
+	}
+	//transit coin
+	if (coinFound>=0){
+		constexpr float CoinSpeed = 100.0f;
+		float z_move = CoinSpeed*elapsed;
+		coins_transforms[coinFound]->position.z += z_move;
+		if(coins_transforms[coinFound]->position.z >= 40){
+			coinFound = -1;
+		}
 	}
 	
 }

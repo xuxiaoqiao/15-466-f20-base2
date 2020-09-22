@@ -37,6 +37,7 @@ struct PlayMode : Mode {
 
 	//hexapod leg to wobble:
 	Scene::Transform *player = nullptr;
+	std::vector<Scene::Transform*> coins_transforms;
 
 	glm::quat player_base_rotation;
 	glm::vec3 player_base_position;
@@ -92,6 +93,8 @@ struct PlayMode : Mode {
 	// float stand = -1.0f; // 1 if standing
 	bool moving = false;
 	int stance = 0; // 0 is along x axis, 1 is along y axis, 2 is along z axis
+
+	int coinFound = 0;
 
 	LevelMap map = generate_mock_level_map();
 
