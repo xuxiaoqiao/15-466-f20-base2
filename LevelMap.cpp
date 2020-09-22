@@ -6,7 +6,7 @@
 
 using nlohmann::json;
 
-extern const std::array<std::string, 2> roller_scene_names;
+extern const std::vector<std::string> roller_scene_names;
 
 static LevelMap::Plane parse_plane(const json &j);
 static LevelMap parse_level_map(const json &j);

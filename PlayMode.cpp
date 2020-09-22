@@ -37,7 +37,7 @@
 //	});
 //});
 
-const std::array<std::string, 2> roller_scene_names = {"level1", "level2"};
+const std::vector<std::string> roller_scene_names = {"level1", "level2", "level3"};
 std::vector<GLuint> roller_meshes_for_lit_color_texture_program_list;
 Load<std::vector<MeshBuffer>> roller_mesh_list(LoadTagDefault, []()-> std::vector<MeshBuffer> const * {
 	auto *result = new std::vector<MeshBuffer>();
