@@ -16,7 +16,7 @@ struct LevelMap {
         // width-major
         Plane(int depth, int width, const std::vector<int> &content) : depth(depth), width(width),
                                                                        content(content) {
-            assert(content.size() == depth * width);
+            assert(content.size() == static_cast<size_t>(depth * width));
         }
         int depth;
         int width;

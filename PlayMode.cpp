@@ -18,7 +18,7 @@ const std::vector<std::string> roller_scene_names = {"level1", "level2", "level3
 std::vector<GLuint> roller_meshes_for_lit_color_texture_program_list;
 Load<std::vector<MeshBuffer>> roller_mesh_list(LoadTagDefault, []()-> std::vector<MeshBuffer> const * {
 	auto *result = new std::vector<MeshBuffer>();
-	for (int scene_name_idx = 0; scene_name_idx < roller_scene_names.size(); scene_name_idx++) {
+	for (size_t scene_name_idx = 0; scene_name_idx < roller_scene_names.size(); scene_name_idx++) {
 		const std::string &n = roller_scene_names.at(scene_name_idx);
 		result->emplace_back(data_path(n + ".pnct"));
 		GLuint roller_meshes_for_lit_color_texture_program = result->at(scene_name_idx).make_vao_for_program(
@@ -30,7 +30,7 @@ Load<std::vector<MeshBuffer>> roller_mesh_list(LoadTagDefault, []()-> std::vecto
 
 Load<std::vector<Scene>> roller_scene_list(LoadTagDefault, []() -> std::vector<Scene> const * {
 	auto *result = new std::vector<Scene>();
-	for (int name_idx = 0; name_idx < roller_scene_names.size(); name_idx++) {
+	for (size_t name_idx = 0; name_idx < roller_scene_names.size(); name_idx++) {
 		const std::string &n = roller_scene_names.at(name_idx);
 		result->emplace_back(data_path(n + ".scene"),
 							 [name_idx](Scene &scene, Scene::Transform *transform, std::string const &mesh_name) {
@@ -56,7 +56,7 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 	coins_transforms.reserve(level_map.coins_pos.size());
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "player") player = &transform;
-		for(int i = 0; i < level_map.coins_pos.size();i++){
+		for(size_t i = 0; i < level_map.coins_pos.size();i++){
 			if (transform.name == level_map.coins_pos[i].second) coins_transforms[i] = &transform;
 		}
 	}
@@ -348,7 +348,7 @@ bool PlayMode::update(float elapsed) {
 	}
 	
 	//check if we collect coins
-	for(int i = 0; i<level_map.coins_pos.size();i++){
+	for(size_t i = 0; i<level_map.coins_pos.size();i++){
 		auto pos = collected_coins.find(i);
 		if (pos != collected_coins.end()){
 			continue;
@@ -383,7 +383,7 @@ bool PlayMode::update(float elapsed) {
 	if (!portaling){
 		if (stance == 2 && level_map.floor.GetTileType(pos1.y, pos1.x) == 2){
 			
-			for (int i=0; i < level_map.portals.size(); i++){
+			for (size_t i=0; i < level_map.portals.size(); i++){
 				if (level_map.portals[i].first.x == pos1.x && level_map.portals[i].first.y == pos1.y)
 					portalto = level_map.portals[i].second;
 				if (level_map.portals[i].second.x == pos1.x && level_map.portals[i].second.y == pos1.y)
