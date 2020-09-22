@@ -232,7 +232,7 @@ bool PlayMode::offmap(std::pair<glm::ivec3, glm::ivec3> pos){
 		// if (level_map.right_wall.GetTileType(pos.first.y, pos.first.z) == 0 || level_map.right_wall.GetTileType(pos.second.y, pos.second.z) == 0) return true;
 	} else {
 		// return false;
-		std::cout << pos.first.x << pos.first.y << pos.second.x << pos.second.y << std::endl;
+		
 		if (level_map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || level_map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
 	}
 	return false;

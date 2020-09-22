@@ -46,7 +46,7 @@ struct PlayMode : Mode {
 	glm::vec3 camera_base_position;
 
 	glm::ivec3 pos1 = level_map.player.pos1;
-	glm::ivec3 pos2 = level_map.player.pos1;
+	glm::ivec3 pos2 = level_map.player.pos2;
 	std::pair<glm::ivec3, glm::ivec3> newpos;
 
 	// float wobble = 0.0f;
