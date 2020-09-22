@@ -73,7 +73,8 @@ Load<std::vector<Scene>> roller_scene_list(LoadTagDefault, []() -> std::vector<S
 	return result;
 });
 
-PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)) {
+PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
+									level_map(roller_level_maps->at(level_idx)) {
 	//get pointers to leg for convenience:
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "player") player = &transform;
@@ -83,10 +84,12 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)) {
 
 	player_base_rotation = player->rotation;
 	player_base_position = player->position;
-	
+
 
 	//get pointer to camera for convenience:
-	if (scene.cameras.size() != 1) throw std::runtime_error("Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
+	if (scene.cameras.size() != 1)
+		throw std::runtime_error(
+				"Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
 	camera_base_position = camera->transform->position;
 
