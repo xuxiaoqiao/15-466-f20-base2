@@ -13,31 +13,66 @@
 #include <random>
 
 
-GLuint hexapod_meshes_for_lit_color_texture_program = 0;
-Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-	MeshBuffer const *ret = new MeshBuffer(data_path("level1.pnct"));
-	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
-	return ret;
+//Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
+//	MeshBuffer const *ret = new MeshBuffer(data_path("level1.pnct"));
+//	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
+//	return ret;
+//});
+//
+//Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
+//	return new Scene(data_path("level1.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
+//		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
+//
+//		scene.drawables.emplace_back(transform);
+//		Scene::Drawable &drawable = scene.drawables.back();
+//
+//		drawable.pipeline = lit_color_texture_program_pipeline;
+//
+//		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
+//		drawable.pipeline.type = mesh.type;
+//		drawable.pipeline.start = mesh.start;
+//		drawable.pipeline.count = mesh.count;
+//
+//	});
+//});
+
+const std::array<std::string, 2> roller_scene_names = {"level1", "level2"};
+std::vector<GLuint> roller_meshes_for_lit_color_texture_program_list;
+Load<std::vector<MeshBuffer>> roller_mesh_list(LoadTagDefault, []()-> std::vector<MeshBuffer> const * {
+	auto *result = new std::vector<MeshBuffer>();
+	for (int scene_name_idx = 0; scene_name_idx < roller_scene_names.size(); scene_name_idx++) {
+		const std::string &n = roller_scene_names.at(scene_name_idx);
+		result->emplace_back(data_path(n + ".pnct"));
+		GLuint roller_meshes_for_lit_color_texture_program = result->at(scene_name_idx).make_vao_for_program(
+				lit_color_texture_program->program);
+		roller_meshes_for_lit_color_texture_program_list.push_back(roller_meshes_for_lit_color_texture_program);
+	}
+	return result;
 });
 
-Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
-	return new Scene(data_path("level1.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
-		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
+Load<std::vector<Scene>> roller_scene_list(LoadTagDefault, []() -> std::vector<Scene> const * {
+	auto *result = new std::vector<Scene>();
+	for (int name_idx = 0; name_idx < roller_scene_names.size(); name_idx++) {
+		const std::string &n = roller_scene_names.at(name_idx);
+		result->emplace_back(data_path(n + ".scene"),
+							 [name_idx](Scene &scene, Scene::Transform *transform, std::string const &mesh_name) {
+								 Mesh const &mesh = roller_mesh_list->at(name_idx).lookup(mesh_name);
 
-		scene.drawables.emplace_back(transform);
-		Scene::Drawable &drawable = scene.drawables.back();
+								 scene.drawables.emplace_back(transform);
+								 Scene::Drawable &drawable = scene.drawables.back();
 
-		drawable.pipeline = lit_color_texture_program_pipeline;
+								 drawable.pipeline = lit_color_texture_program_pipeline;
 
-		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
-		drawable.pipeline.type = mesh.type;
-		drawable.pipeline.start = mesh.start;
-		drawable.pipeline.count = mesh.count;
-
-	});
+								 drawable.pipeline.vao = roller_meshes_for_lit_color_texture_program_list.at(name_idx);
+								 drawable.pipeline.type = mesh.type;
+								 drawable.pipeline.start = mesh.start;
+								 drawable.pipeline.count = mesh.count;
+							 });
+	}
+	return result;
 });
 
-PlayMode::PlayMode() : scene(*hexapod_scene) {
+PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)) {
 	//get pointers to leg for convenience:
 	for (auto &transform : scene.transforms) {
 		if (transform.name == "player") player = &transform;

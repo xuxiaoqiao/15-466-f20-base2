@@ -93,7 +93,7 @@ int main(int argc, char **argv) {
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >());
+	Mode::set_current(std::make_shared< PlayMode >(0));
 
 	//------------ main loop ------------
 
@@ -144,6 +144,9 @@ int main(int argc, char **argv) {
 						px.a = 0xff;
 					}
 					save_png(filename, glm::uvec2(w,h), data.data(), LowerLeftOrigin);
+				} else if (evt.type == SDL_KEYDOWN && evt.key.keysym.sym == SDLK_n) {
+					// next level
+					Mode::set_current(std::make_shared<PlayMode>(1));
 				}
 			}
 			if (!Mode::current) break;
