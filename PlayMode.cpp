@@ -215,8 +215,9 @@ std::pair<glm::uvec3, glm::uvec3> PlayMode::next_pos(glm::uvec3 pos1, glm::uvec3
 bool PlayMode::offmap(std::pair<glm::uvec3, glm::uvec3> pos){
 	if (wall){
 		return false;
+		// if (level_map.right_wall.GetTileType(pos.first.y, pos.first.z) == 0 || level_map.right_wall.GetTileType(pos.second.y, pos.second.z) == 0) return true;
 	} else {
-		if (map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
+		if (level_map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || level_map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
 	}
 	return false;
 }
@@ -243,6 +244,7 @@ void PlayMode::to_wall(){
 				) * camera->transform->rotation;
 	camera->transform->position.z -= 5;
 	camera->transform->position.x -= 5;
+	camera_base_position = camera->transform->position;
 }
 
 void PlayMode::to_floor(){
@@ -261,6 +263,7 @@ void PlayMode::to_floor(){
 				) * camera->transform->rotation;
 	camera->transform->position.z += 5;
 	camera->transform->position.x += 5;
+	camera_base_position = camera->transform->position;
 }
 
 
@@ -295,6 +298,20 @@ void PlayMode::update(float elapsed) {
 			if (right.pressed) move.x = 1.0f;
 			if (down.pressed) move.y = -1.0f;
 			if (up.pressed) move.y = 1.0f;
+
+			if (wall){
+				if ((pos1.z == 0 || pos2.z == 0) && left.pressed){
+					to_floor();
+					end_move();
+					return;
+				}
+			} else {
+				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed){
+					to_wall();
+					end_move();
+					return;
+				}
+			}
 		
 			newpos = next_pos(pos1, pos2, move);
 			if (offmap(newpos)){ //check map
