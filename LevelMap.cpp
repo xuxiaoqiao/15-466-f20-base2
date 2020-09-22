@@ -30,10 +30,10 @@ static LevelMap parse_level_map(const json &j) {
     if (j.contains("right_wall")) {
         right_wall = std::make_optional(parse_plane(j.at("right_wall")));
     }
-    std::vector<glm::uvec3> coins_pos;
-    assert(j.at("coins_position").is_array());
-    for (const auto &c : j.at("coins_position")) {
-        coins_pos.push_back(parse_uvec3(c));
+    std::vector<std::pair<glm::uvec3, std::string>> coins_pos;
+    assert(j.at("coins").is_array());
+    for (const auto &c : j.at("coins")) {
+        coins_pos.emplace_back(parse_uvec3(c.at("position")), c.at("id"));
     }
     return LevelMap(floor, right_wall, coins_pos);
 }

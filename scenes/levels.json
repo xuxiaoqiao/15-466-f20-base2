@@ -20,9 +20,16 @@
         1, 1, 1, 0, 0, 0, 0, 0
       ]
     },
-    "coins_position": [
-      [0, 0, 3],
-      [7, 0, 1]
+    "coins": [
+      {
+        "position": [0, 0, 3],
+        "id": "mycoin1"
+      },
+      {
+        "position": [7, 0, 1],
+        "id": "mycoin2"
+      }
+
     ],
     "player": {
       "pos": [1, 0, 2],
@@ -50,9 +57,16 @@
         1, 1, 1, 0, 0, 0, 0, 0
       ]
     },
-    "coins_position": [
-      [0, 0, 3],
-      [7, 0, 1]
+    "coins": [
+      {
+        "position": [0, 0, 3],
+        "id": "mycoin1"
+      },
+      {
+        "position": [7, 0, 1],
+        "id": "mycoin2"
+      }
+
     ],
     "player": {
       "pos": [1, 0, 2],

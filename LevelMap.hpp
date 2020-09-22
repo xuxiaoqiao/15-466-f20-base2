@@ -1,5 +1,7 @@
 #include <vector>
 #include <optional>
+#include <utility>
+#include <string>
 #include <glm/glm.hpp>
 
 #include "Load.hpp"
@@ -31,22 +33,9 @@ struct LevelMap {
         std::vector<int> content;
     };
 
-    LevelMap(const Plane &floor, const std::optional<Plane> &rightWall, const std::vector<glm::uvec3> &coinsPos)
+    LevelMap(const Plane &floor, const std::optional<Plane> &rightWall, const std::vector<std::pair<glm::uvec3, std::string>> &coinsPos)
             : floor(floor), right_wall(rightWall), coins_pos(coinsPos) {}
     Plane floor;
     std::optional<Plane> right_wall;
-    std::vector<glm::uvec3> coins_pos;
+    std::vector<std::pair<glm::uvec3, std::string>> coins_pos;
 };
-
-inline struct LevelMap generate_mock_level_map() {
-    auto floor = LevelMap::Plane(4, 8,
-                                 {0, 0, 0, 0, 1, 1, 1, 1,
-                                  1, 1, 1, 1, 1, 0, 0, 0,
-                                  1, 1, 1, 1, 1, 0, 0, 0,
-                                  1, 1, 1, 0, 0, 0, 0, 0});
-    auto coins_pos = std::vector<glm::uvec3>{{3, 0, 0}};
-
-    LevelMap m(floor, std::nullopt, coins_pos);
-    return m;
-}
-
