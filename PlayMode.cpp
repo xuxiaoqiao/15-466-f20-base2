@@ -168,29 +168,29 @@ std::vector<int> PlayMode::next_pos(std::vector<int> pos, glm::vec3 operation){
 	if (operation.y != 0) operation.y /= abs(operation.y);
 	if (stance == 0){
 		pos[1] -= operation.y;
-		pos[3] -= operation.y;
+		pos[4] -= operation.y;
 		if (operation.x > 0){
-			pos[0] = std::max(pos[0], pos[2]) + 1;
-			pos[2] = pos[0];
+			pos[0] = std::max(pos[0], pos[3]) + 1;
+			pos[3] = pos[0];
 		} else if (operation.x < 0){
-			pos[0] = std::min(pos[0], pos[2]) - 1;
-			pos[2] = pos[0];
+			pos[0] = std::min(pos[0], pos[3]) - 1;
+			pos[3] = pos[0];
 		}
 	} else if (stance == 1){
 		pos[0] += operation.x;
-		pos[2] += operation.x;
+		pos[3] += operation.x;
 		if (operation.y > 0){
-			pos[1] = std::min(pos[1], pos[3]) - 1;
-			pos[3] = pos[1];
+			pos[1] = std::min(pos[1], pos[4]) - 1;
+			pos[4] = pos[1];
 		} else if (operation.y < 0){
-			pos[1] = std::max(pos[1], pos[3]) + 1;
-			pos[3] = pos[1];
+			pos[1] = std::max(pos[1], pos[4]) + 1;
+			pos[4] = pos[1];
 		}
 	} else if (stance == 2){
 		pos[0] += operation.x;
 		pos[1] -= operation.y;
-		pos[2] += operation.x*2;
-		pos[3] -= operation.y*2;
+		pos[3] += operation.x*2;
+		pos[4] -= operation.y*2;
 	}
 	return pos;
 }
@@ -233,12 +233,19 @@ void PlayMode::update(float elapsed) {
 		{
 
 			//combine inputs into a move:
-			constexpr float PlayerSpeed = 100.0f;
+			constexpr float PlayerSpeed = 300.0f;
 			glm::vec3 move = glm::vec3(0.0f);
-			if (left.pressed && !right.pressed) move.x = -1.0f;
-			if (!left.pressed && right.pressed) move.x = 1.0f;
-			if (down.pressed && !up.pressed) move.y = -1.0f;
-			if (!down.pressed && up.pressed) move.y = 1.0f;
+			if (wall){
+				if (left.pressed) move.z = -1.0f;
+				if (right.pressed) move.z = 1.0f;
+				if (down.pressed) move.y = -1.0f;
+				if (up.pressed) move.y = 1.0f;
+			} else {
+				if (left.pressed) move.x = -1.0f;
+				if (right.pressed) move.x = 1.0f;
+				if (down.pressed) move.y = -1.0f;
+				if (up.pressed) move.y = 1.0f;
+			}
 			newpos = next_pos(pos, move);
 			if (offmap(newpos)){ //check map
 				end_move();
@@ -284,6 +291,11 @@ void PlayMode::update(float elapsed) {
 					glm::radians(drot*move.y),
 					axisx
 				) * player_base_rotation;
+			} else if (move.z != 0){
+				player->rotation = glm::angleAxis(
+					glm::radians(drot*move.z),
+					axisz
+				) * player_base_rotation;
 			}
 
 			if (stance == 0){
@@ -297,6 +309,7 @@ void PlayMode::update(float elapsed) {
 				move.x *= 1.5;
 				move.y *= 1.5;
 			}
+			
 			
 			player->position = player_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
 			camera->transform->position = camera_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
