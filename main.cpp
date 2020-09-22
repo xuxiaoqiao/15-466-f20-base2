@@ -93,7 +93,9 @@ int main(int argc, char **argv) {
 	call_load_functions();
 
 	//------------ create game mode + make current --------------
-	Mode::set_current(std::make_shared< PlayMode >(0));
+	int cur_level = 0;
+	bool next_level = false;
+	Mode::set_current(std::make_shared< PlayMode >(cur_level));
 
 	//------------ main loop ------------
 
@@ -162,7 +164,11 @@ int main(int argc, char **argv) {
 			//lag to avoid spiral of death:
 			elapsed = std::min(0.1f, elapsed);
 
-			Mode::current->update(elapsed);
+			next_level = Mode::current->update(elapsed);
+			if (cur_level<1){
+				cur_level ++;
+			}
+			if (next_level) Mode::set_current(std::make_shared<PlayMode>(cur_level));
 			if (!Mode::current) break;
 		}
 

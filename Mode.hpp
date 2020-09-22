@@ -15,7 +15,7 @@ struct Mode : std::enable_shared_from_this< Mode > {
 
 	//update is called at the start of a new frame, after events are handled:
 	// 'elapsed' is time in seconds since the last call to 'update'
-	virtual void update(float elapsed) { }
+	virtual bool update(float elapsed) { return false;}
 
 	//draw is called after update:
 	virtual void draw(glm::uvec2 const &drawable_size) = 0;
