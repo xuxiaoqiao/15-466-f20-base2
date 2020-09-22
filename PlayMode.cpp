@@ -449,8 +449,6 @@ bool PlayMode::update(float elapsed) {
 		}
 		if (level_map.coins_pos[i].first ==pos1 || level_map.coins_pos[i].first == pos2){
 			coinFound = i;
-			std::cout<<"pos1 "<<pos1.x<<" "<<pos1.y<<" "<<pos1.z<<std::endl;
-			std::cout<<"pos2 "<<pos2.x<<" "<<pos2.y<<" "<<pos2.z<<std::endl;
 			collected_coins.insert(i);
 			break;
 		}
@@ -458,11 +456,18 @@ bool PlayMode::update(float elapsed) {
 	//transit coin
 	if (coinFound>=0){
 		constexpr float CoinSpeed = 20.0f;
-		float z_move = CoinSpeed*elapsed;
-		coins_transforms[coinFound]->position.z += z_move;
-		if(coins_transforms[coinFound]->position.z >= 40){
-			coinFound = -1;
+		glm::vec3 coin_move = CoinSpeed*elapsed*dirz;
+		coins_transforms[coinFound]->position += coin_move;
+		if (wall){
+			if(coins_transforms[coinFound]->position.x <= -30){
+				coinFound = -1;
+			}
+		}else{
+			if(coins_transforms[coinFound]->position.z >= 30){
+				coinFound = -1;
+			}
 		}
+		
 	}else{
 		if (collected_coins.size() == level_map.coins_pos.size()){
 			//collect all coin, move to next level
@@ -507,12 +512,12 @@ void PlayMode::draw(glm::uvec2 const &drawable_size) {
 		));
 
 		constexpr float H = 0.09f;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
+		lines.draw_text("WASD to roll the block",
 			glm::vec3(-aspect + 0.1f * H, -1.0 + 0.1f * H, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0x00, 0x00, 0x00, 0x00));
 		float ofs = 2.0f / drawable_size.y;
-		lines.draw_text("Mouse motion rotates camera; WASD moves; escape ungrabs mouse",
+		lines.draw_text("WASD to roll the block",
 			glm::vec3(-aspect + 0.1f * H + ofs, -1.0 + + 0.1f * H + ofs, 0.0),
 			glm::vec3(H, 0.0f, 0.0f), glm::vec3(0.0f, H, 0.0f),
 			glm::u8vec4(0xff, 0xff, 0xff, 0x00));
