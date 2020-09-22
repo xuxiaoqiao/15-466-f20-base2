@@ -41,6 +41,7 @@ struct PlayMode : Mode {
 
 	glm::quat player_base_rotation;
 	glm::vec3 player_base_position;
+	glm::quat camera_base_rotation;
 	glm::vec3 camera_base_position;
 
 	glm::uvec3 pos1 = glm::uvec3(1,2,0);
