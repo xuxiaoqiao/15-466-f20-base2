@@ -3,20 +3,20 @@
 #include <json.hpp>
 #include <fstream>
 #include <cassert>
+#include <vector>
+#include <string>
 
 using nlohmann::json;
-
-extern const std::array<std::string, 2> roller_scene_names;
 
 static LevelMap::Plane parse_plane(const json &j);
 static LevelMap parse_level_map(const json &j);
 static glm::ivec3 parse_ivec3(const json &j);
+static glm::ivec2 parse_ivec2(const json &j);
 
 Load<std::vector<LevelMap>> roller_level_maps(LoadTagDefault, []() -> std::vector<LevelMap> const * {
     std::vector<LevelMap> *result = new std::vector<LevelMap>;
     std::ifstream ifs(data_path("levels.json"));
     json j = json::parse(ifs);
-    assert(j.size() == roller_scene_names.size());
     for (const auto &lj : j) {
         LevelMap l = parse_level_map(lj);
         result->push_back(l);
@@ -40,7 +40,17 @@ static LevelMap parse_level_map(const json &j) {
     p.pos1 = parse_ivec3(player_json.at("pos1"));
     p.pos2 = parse_ivec3(player_json.at("pos2"));
     p.stance = player_json.at("stance");
-    return LevelMap(floor, right_wall, coins_pos, p);
+    std::vector<std::pair<glm::ivec2, glm::ivec2>> portals;
+    if (j.contains("portals")) {
+        assert(j.at("portals").is_array());
+        const json &portals_json = j.at("portals");
+        for (const auto &p_json : portals_json) {
+            glm::ivec2 a = parse_ivec2(p_json.at(0));
+            glm::ivec2 b = parse_ivec2(p_json.at(1));
+            portals.emplace_back(a, b);
+        }
+    }
+    return LevelMap(floor, right_wall, coins_pos, p, portals);
 }
 
 
@@ -58,5 +68,13 @@ static glm::ivec3 parse_ivec3(const json &j) {
     result[0] = j.at(0);
     result[1] = j.at(1);
     result[2] = j.at(2);
+    return result;
+}
+
+static glm::ivec2 parse_ivec2(const json &j) {
+    glm::ivec2 result;
+    assert(j.is_array());
+    result[0] = j.at(0);
+    result[1] = j.at(1);
     return result;
 }
