@@ -105,7 +105,7 @@ PlayMode::~PlayMode() {
 }
 
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
-	if (moving) return false;
+	if (moving || portaling) return false;
 	if (evt.type == SDL_KEYDOWN) {
 		// if (evt.key.keysym.sym == SDLK_ESCAPE) {
 		// 	SDL_SetRelativeMouseMode(SDL_FALSE);
@@ -289,7 +289,33 @@ bool PlayMode::update(float elapsed) {
 	// 	camera->transform->position += move.x * elapsed * dirx + move.y * elapsed * diry;
 	// 	moving = false;
 	// }
-
+	constexpr float PlayerSpeed = 300.0f;
+	constexpr float PortalSpeed = 1.0f;
+	if (portaling){
+		dmov += elapsed*PortalSpeed;
+		dmov = std::min(dmov, 2.0f);
+		player->position = player_base_position + dmov * portaldir * dirz;
+		if (dmov*portaldir == -2.0f){
+			portaldir = 1.0f;
+			player_base_position.x += portalto.x;
+			player_base_position.y -= portalto.y;
+			
+			pos1.x += portalto.x;
+			pos1.y += portalto.y;
+			pos2.x += portalto.x;
+			pos2.y += portalto.y;
+			player_base_position.z = player->position.z;
+			camera->transform->position.x += portalto.x;
+			camera->transform->position.y -= portalto.y;
+			camera_base_position = camera->transform->position;
+			dmov = 0;
+		} else if (dmov*portaldir == 2.0f){
+			player_base_position = player->position;
+			dmov = 0;
+			portaldir = 0.0f;
+			portaling = false;
+		}
+	}
 
 	if (moving){
 
@@ -298,7 +324,7 @@ bool PlayMode::update(float elapsed) {
 		{
 
 			//combine inputs into a move:
-			constexpr float PlayerSpeed = 300.0f;
+			
 			glm::vec3 move = glm::vec3(0.0f);
 			if (left.pressed) move.x = -1.0f;
 			if (right.pressed) move.x = 1.0f;
@@ -429,8 +455,6 @@ bool PlayMode::update(float elapsed) {
 					end_move();
 				}
 			}
-
-			
 			
 		}
 
@@ -469,6 +493,20 @@ bool PlayMode::update(float elapsed) {
 			return true;
 		}
 	}
+	if (!portaling){
+		if (stance == 2 && level_map.floor.GetTileType(pos1.y, pos1.x) == 2){
+			
+			for (int i=0; i < level_map.portals.size(); i++){
+				if (level_map.portals[i].first.x == pos1.x && level_map.portals[i].first.y == pos1.y)
+					portalto = level_map.portals[i].second;
+				if (level_map.portals[i].second.x == pos1.x && level_map.portals[i].second.y == pos1.y)
+					portalto = level_map.portals[i].first;
+			}
+			portaling = true;
+			portaldir = -1.0f;
+		}
+	}
+	
 	return false;
 }
 

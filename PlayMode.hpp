@@ -55,8 +55,11 @@ struct PlayMode : Mode {
 	float dmov = 0.0f;
 	// float stand = -1.0f; // 1 if standing
 	bool moving = false;
+	bool portaling = false;
+	float portaldir = 0.0f;
 	int stance = level_map.player.stance; // 0 is along x axis, 1 is along y axis, 2 is along z axis
-
+	glm::ivec2 portalto;
+	
 	int coinFound = -1;
 	std::set<int> collected_coins;
 
@@ -72,6 +75,8 @@ struct PlayMode : Mode {
 	bool wall = false;
 	//camera:
 	Scene::Camera *camera = nullptr;
+
+
 
 };
 
