@@ -38,6 +38,7 @@ struct PlayMode : Mode {
 
 	//hexapod leg to wobble:
 	Scene::Transform *player = nullptr;
+	std::vector<Scene::Transform*> coins_transforms;
 
 	glm::quat player_base_rotation;
 	glm::vec3 player_base_position;
@@ -55,6 +56,11 @@ struct PlayMode : Mode {
 	bool moving = false;
 	int stance = 0; // 0 is along x axis, 1 is along y axis, 2 is along z axis
 
+<<<<<<< HEAD
+	int coinFound = 0;
+
+=======
+>>>>>>> 56b857cdf9f36e79821037d116678dadcc1efbe5
 	glm::vec3 dirx = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 diry = glm::vec3(0.0f, 1.0f, 0.0f);
 	glm::vec3 dirz = glm::vec3(0.0f, 0.0f, 1.0f);
