@@ -17,7 +17,7 @@ Load<std::vector<LevelMap>> roller_level_maps(LoadTagDefault, []() -> std::vecto
     std::vector<LevelMap> *result = new std::vector<LevelMap>;
     std::ifstream ifs(data_path("levels.json"));
     json j = json::parse(ifs);
-//    assert(j.size() == roller_scene_names.size());
+    assert(j.size() == roller_scene_names.size());
     for (const auto &lj : j) {
         LevelMap l = parse_level_map(lj);
         result->push_back(l);
