@@ -14,30 +14,6 @@
 #include <vector>
 
 
-
-//Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
-//	MeshBuffer const *ret = new MeshBuffer(data_path("level1.pnct"));
-//	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
-//	return ret;
-//});
-//
-//Load< Scene > hexapod_scene(LoadTagDefault, []() -> Scene const * {
-//	return new Scene(data_path("level1.scene"), [&](Scene &scene, Scene::Transform *transform, std::string const &mesh_name){
-//		Mesh const &mesh = hexapod_meshes->lookup(mesh_name);
-//
-//		scene.drawables.emplace_back(transform);
-//		Scene::Drawable &drawable = scene.drawables.back();
-//
-//		drawable.pipeline = lit_color_texture_program_pipeline;
-//
-//		drawable.pipeline.vao = hexapod_meshes_for_lit_color_texture_program;
-//		drawable.pipeline.type = mesh.type;
-//		drawable.pipeline.start = mesh.start;
-//		drawable.pipeline.count = mesh.count;
-//
-//	});
-//});
-
 const std::vector<std::string> roller_scene_names = {"level1", "level2", "level3"};
 std::vector<GLuint> roller_meshes_for_lit_color_texture_program_list;
 Load<std::vector<MeshBuffer>> roller_mesh_list(LoadTagDefault, []()-> std::vector<MeshBuffer> const * {
@@ -107,10 +83,6 @@ PlayMode::~PlayMode() {
 bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size) {
 	if (moving || portaling) return false;
 	if (evt.type == SDL_KEYDOWN) {
-		// if (evt.key.keysym.sym == SDLK_ESCAPE) {
-		// 	SDL_SetRelativeMouseMode(SDL_FALSE);
-		// 	return true;
-		// } 
 		
 		if (evt.key.keysym.sym == SDLK_a) {
 			left.downs += 1;
@@ -132,53 +104,8 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 			down.pressed = true;
 			moving = true;
 			return true;
-		} else if (evt.key.keysym.sym == SDLK_h) {
-			if (wall) to_floor();
-			else to_wall();
-		} else if (evt.key.keysym.sym == SDLK_j) {
-			camera->transform->position.x -= 1;
-		} else if (evt.key.keysym.sym == SDLK_l) {
-			camera->transform->position.x += 1;
-		} else if (evt.key.keysym.sym == SDLK_i) {
-			camera->transform->position.z += 1;
-		} else if (evt.key.keysym.sym == SDLK_k) {
-			camera->transform->position.z -= 1;
 		}
 	} 
-	// else if (evt.type == SDL_KEYUP) {
-	// 	if (evt.key.keysym.sym == SDLK_a) {
-	// 		left.pressed = false;
-	// 		return true;
-	// 	} else if (evt.key.keysym.sym == SDLK_d) {
-	// 		right.pressed = false;
-	// 		return true;
-	// 	} else if (evt.key.keysym.sym == SDLK_w) {
-	// 		up.pressed = false;
-	// 		return true;
-	// 	} else if (evt.key.keysym.sym == SDLK_s) {
-	// 		down.pressed = false;
-	// 		return true;
-	// 	}
-	// } 
-	// else if (evt.type == SDL_MOUSEBUTTONDOWN) {
-	// 	if (SDL_GetRelativeMouseMode() == SDL_FALSE) {
-	// 		SDL_SetRelativeMouseMode(SDL_TRUE);
-	// 		return true;
-	// 	}
-	// } else if (evt.type == SDL_MOUSEMOTION) {
-	// 	if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
-	// 		glm::vec2 motion = glm::vec2(
-	// 			evt.motion.xrel / float(window_size.y),
-	// 			-evt.motion.yrel / float(window_size.y)
-	// 		);
-	// 		camera->transform->rotation = glm::normalize(
-	// 			camera->transform->rotation
-	// 			* glm::angleAxis(-motion.x * camera->fovy, glm::vec3(0.0f, 1.0f, 0.0f))
-	// 			* glm::angleAxis(motion.y * camera->fovy, glm::vec3(1.0f, 0.0f, 0.0f))
-	// 		);
-	// 		return true;
-	// 	}
-	// }
 
 	return false;
 }
@@ -228,14 +155,11 @@ std::pair<glm::ivec3, glm::ivec3> PlayMode::next_pos(glm::ivec3 pos1, glm::ivec3
 
 bool PlayMode::offmap(std::pair<glm::ivec3, glm::ivec3> pos){
 	if (wall){
-//		return false;
 		assert(level_map.right_wall);
 		if (level_map.right_wall->GetTileType(pos.first.y, pos.first.z) == 0 ||
 			level_map.right_wall->GetTileType(pos.second.y, pos.second.z) == 0)
 			return true;
 	} else {
-		// return false;
-		
 		if (level_map.floor.GetTileType(pos.first.y, pos.first.x) == 0 || level_map.floor.GetTileType(pos.second.y, pos.second.x) == 0) return true;
 	}
 	return false;
@@ -275,20 +199,7 @@ void PlayMode::to_floor(){
 
 bool PlayMode::update(float elapsed) {
 
-	//slowly rotates through [0,1):
-	// wobble += elapsed / 10.0f;
-	// wobble -= std::floor(wobble);
-	// if (moving){
-	// 	glm::vec2 move = glm::vec2(0.0f);
-	// 	if (left.pressed && !right.pressed) move.x = -1.0f;
-	// 	if (!left.pressed && right.pressed) move.x = 1.0f;
-	// 	if (down.pressed && !up.pressed) move.y = -1.0f;
-	// 	if (!down.pressed && up.pressed) move.y = 1.0f;
-		
-	// 	player->position += move.x * elapsed * dirx + move.y * elapsed * diry;
-	// 	camera->transform->position += move.x * elapsed * dirx + move.y * elapsed * diry;
-	// 	moving = false;
-	// }
+
 	constexpr float PlayerSpeed = 300.0f;
 	constexpr float PortalSpeed = 5.0f;
 	if (portaling){
@@ -320,10 +231,7 @@ bool PlayMode::update(float elapsed) {
 	if (moving){
 
 		
-		//move camera:
 		{
-
-			//combine inputs into a move:
 			
 			glm::vec3 move = glm::vec3(0.0f);
 			if (left.pressed) move.x = -1.0f;
@@ -335,16 +243,11 @@ bool PlayMode::update(float elapsed) {
 				if ((pos1.z == 0 || pos2.z == 0) && left.pressed){
 					move.x = 0.0f;
 					rot_camera = 1.0f;
-					// end_move();
-					// return;
 				}
 			} else {
 				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed && level_map.right_wall.has_value()){
-					// std::cout << level_map.right_wall.has_value() << std::endl;
 					move.x = 0.0f;
 					rot_camera = -1.0f;
-					// end_move();
-					// return;
 				}
 			}
 			
@@ -353,18 +256,7 @@ bool PlayMode::update(float elapsed) {
 				end_move();
 				return false;
 			}
-			//make it so that moving diagonally doesn't go faster:
-			// if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
-			// glm::mat4x3 frame = player->make_local_to_parent();
-			// glm::vec3 movx = frame[0];
-			// glm::vec3 dirx = -frame[1];
-			// glm::vec3 dirz = frame[2];
-			// player->rotation *= glm::angleAxis(
-			// 	glm::radians(1.57f*move.x),
-			// 	glm::vec3(0.0f, 1.0f, 0.0f)
-			// );
-			// player->rotation *= toQuat(0.0f, 45.0f*PI/180.0f*move.x, 0.0f);
 			drot += elapsed*PlayerSpeed;
 			
 			if (abs(drot) >= 90.0f){
@@ -373,16 +265,6 @@ bool PlayMode::update(float elapsed) {
 			dmov = drot/90.0f;
 				
 			
-			// if (drotx == 0 && stand == 1.0f){
-			// 	for (int i=0; i<3; i++){
-			// 		std::cout << (move.x * dirz * stand)[i] << " ";
-			// 	}
-			// 	std::cout << std::endl;
-			// 	player->position += move.x * dirx+ move.x * dirz * stand;
-			// 	camera->transform->position += move.x * dirx + move.x * dirz * stand;
-			// 	move.x = 0;
-			// 	stand = -1.0f;
-			// }
 			if (rot_camera != 0.0f){
 				camera->transform->rotation = glm::angleAxis(
 					glm::radians(drot*rot_camera),
