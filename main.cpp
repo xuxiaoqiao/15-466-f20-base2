@@ -148,7 +148,9 @@ int main(int argc, char **argv) {
 					save_png(filename, glm::uvec2(w,h), data.data(), LowerLeftOrigin);
 				} else if (evt.type == SDL_KEYDOWN && evt.key.keysym.sym == SDLK_n) {
 					// next level
-					Mode::set_current(std::make_shared<PlayMode>(1));
+					cur_level++;
+					cur_level %= roller_level_maps->size();
+					Mode::set_current(std::make_shared<PlayMode>(cur_level));
 				}
 			}
 			if (!Mode::current) break;
