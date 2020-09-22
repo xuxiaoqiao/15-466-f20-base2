@@ -1,8 +1,8 @@
-# (TODO: your game's title)
+# Keep Rolling
 
-Author: (TODO: your name)
+Author: Xiaoqiao Xu, Zhengyang Xia, Zizhuo Lin
 
-Design: (TODO: In two sentences or fewer, describe what is new and interesting about your game.)
+Design: Integrated several new mechanisms and dimensions into the classic sokoban game.
 
 Screen Shot:
 
@@ -10,9 +10,9 @@ Screen Shot:
 
 How To Play:
 
-(TODO: describe the controls and (if needed) goals/strategy.)
+Use W, A, S and D to roll the rectangle to different directions. Collect all the coins in a level. Rolling towards a wall will change the direction of gravity.
 
-Sources: (TODO: list a source URL for any assets you did not create yourself. Make sure you have a license for the asset.)
+Sources: N/A.
 
 This game was built with [NEST](NEST.md).
 
