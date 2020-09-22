@@ -168,11 +168,8 @@ int main(int argc, char **argv) {
 
 			next_level = Mode::current->update(elapsed);
 			if (next_level) {
-				if (cur_level<roller_level_maps->size()){
-					cur_level ++;
-				} else {
-					cur_level = 0;
-				}
+				cur_level++;
+				cur_level %= roller_level_maps->size();
 			}
 			if (next_level) Mode::set_current(std::make_shared<PlayMode>(cur_level));
 			if (!Mode::current) break;
