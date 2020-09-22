@@ -10,6 +10,7 @@
 
 #include <vector>
 #include <deque>
+#include <set>
 
 struct PlayMode : Mode {
 	PlayMode(int level_idx);
@@ -17,7 +18,7 @@ struct PlayMode : Mode {
 
 	//functions called by main loop:
 	virtual bool handle_event(SDL_Event const &, glm::uvec2 const &window_size) override;
-	virtual void update(float elapsed) override;
+	virtual bool update(float elapsed) override;
 	virtual void draw(glm::uvec2 const &drawable_size) override;
 	bool offmap(std::pair<glm::ivec3, glm::ivec3> pos);
 	void end_move();
@@ -55,6 +56,9 @@ struct PlayMode : Mode {
 	// float stand = -1.0f; // 1 if standing
 	bool moving = false;
 	int stance = level_map.player.stance; // 0 is along x axis, 1 is along y axis, 2 is along z axis
+
+	int coinFound = -1;
+	std::set<int> collected_coins;
 
 	glm::vec3 dirx = glm::vec3(1.0f, 0.0f, 0.0f);
 	glm::vec3 diry = glm::vec3(0.0f, 1.0f, 0.0f);

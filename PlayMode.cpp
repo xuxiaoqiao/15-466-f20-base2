@@ -81,7 +81,6 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 		if (transform.name == "player") player = &transform;
 		for(int i = 0; i < level_map.coins_pos.size();i++){
 			if (transform.name == level_map.coins_pos[i].second) coins_transforms[i] = &transform;
-			std::cout<<transform.name<<std::endl;
 		}
 	}
 
@@ -270,7 +269,7 @@ void PlayMode::to_floor(){
 }
 
 
-void PlayMode::update(float elapsed) {
+bool PlayMode::update(float elapsed) {
 
 	//slowly rotates through [0,1):
 	// wobble += elapsed / 10.0f;
@@ -322,7 +321,7 @@ void PlayMode::update(float elapsed) {
 			newpos = next_pos(pos1, pos2, move);
 			if (offmap(newpos)){ //check map
 				end_move();
-				return;
+				return false;
 			}
 			//make it so that moving diagonally doesn't go faster:
 			// if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
@@ -438,23 +437,35 @@ void PlayMode::update(float elapsed) {
 		down.downs = 0;
 	}
 	
-	// //check if we collect coins
-	// for(int i = 0; i<level_map.coins_pos.size();i++){
-	// 	if (level_map.coins_pos[i].first ==pos1 || level_map.coins_pos[i].first == pos2){
-	// 		coinFound = i;
-	// 		break;
-	// 	}
-	// }
-	// //transit coin
-	// if (coinFound>=0){
-	// 	constexpr float CoinSpeed = 100.0f;
-	// 	float z_move = CoinSpeed*elapsed;
-	// 	coins_transforms[coinFound]->position.z += z_move;
-	// 	if(coins_transforms[coinFound]->position.z >= 40){
-	// 		coinFound = -1;
-	// 	}
-	// }
-	
+	//check if we collect coins
+	for(int i = 0; i<level_map.coins_pos.size();i++){
+		auto pos = collected_coins.find(i);
+		if (pos != collected_coins.end()){
+			continue;
+		}
+		if (level_map.coins_pos[i].first ==pos1 || level_map.coins_pos[i].first == pos2){
+			coinFound = i;
+			std::cout<<"pos1 "<<pos1.x<<" "<<pos1.y<<" "<<pos1.z<<std::endl;
+			std::cout<<"pos2 "<<pos2.x<<" "<<pos2.y<<" "<<pos2.z<<std::endl;
+			collected_coins.insert(i);
+			break;
+		}
+	}
+	//transit coin
+	if (coinFound>=0){
+		constexpr float CoinSpeed = 20.0f;
+		float z_move = CoinSpeed*elapsed;
+		coins_transforms[coinFound]->position.z += z_move;
+		if(coins_transforms[coinFound]->position.z >= 40){
+			coinFound = -1;
+		}
+	}else{
+		if (collected_coins.size() == level_map.coins_pos.size()){
+			//collect all coin, move to next level
+			return true;
+		}
+	}
+	return false;
 }
 
 void PlayMode::draw(glm::uvec2 const &drawable_size) {
