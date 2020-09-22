@@ -81,6 +81,7 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 		if (transform.name == "player") player = &transform;
 		for(int i = 0; i < level_map.coins_pos.size();i++){
 			if (transform.name == level_map.coins_pos[i].second) coins_transforms[i] = &transform;
+			std::cout<<transform.name<<std::endl;
 		}
 	}
 
@@ -367,22 +368,22 @@ void PlayMode::update(float elapsed) {
 		down.downs = 0;
 	}
 	
-	//check if we collect coins
-	for(int i = 0; i<level_map.coins_pos.size();i++){
-		if (c==pos1 || c == pos2){
-			coinFound = i;
-			break;
-		}
-	}
-	//transit coin
-	if (coinFound>=0){
-		constexpr float CoinSpeed = 100.0f;
-		float z_move = CoinSpeed*elapsed;
-		coins_transforms[coinFound]->position.z += z_move;
-		if(coins_transforms[coinFound]->position.z >= 40){
-			coinFound = -1;
-		}
-	}
+	// //check if we collect coins
+	// for(int i = 0; i<level_map.coins_pos.size();i++){
+	// 	if (level_map.coins_pos[i].first ==pos1 || level_map.coins_pos[i].first == pos2){
+	// 		coinFound = i;
+	// 		break;
+	// 	}
+	// }
+	// //transit coin
+	// if (coinFound>=0){
+	// 	constexpr float CoinSpeed = 100.0f;
+	// 	float z_move = CoinSpeed*elapsed;
+	// 	coins_transforms[coinFound]->position.z += z_move;
+	// 	if(coins_transforms[coinFound]->position.z >= 40){
+	// 		coinFound = -1;
+	// 	}
+	// }
 	
 }
 
