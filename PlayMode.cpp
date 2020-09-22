@@ -96,6 +96,7 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 				"Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
 	camera_base_position = camera->transform->position;
+	camera_base_rotation = camera->transform->rotation;
 
 }
 
@@ -133,6 +134,14 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 		} else if (evt.key.keysym.sym == SDLK_h) {
 			if (wall) to_floor();
 			else to_wall();
+		} else if (evt.key.keysym.sym == SDLK_j) {
+			camera->transform->position.x -= 1;
+		} else if (evt.key.keysym.sym == SDLK_l) {
+			camera->transform->position.x += 1;
+		} else if (evt.key.keysym.sym == SDLK_i) {
+			camera->transform->position.z += 1;
+		} else if (evt.key.keysym.sym == SDLK_k) {
+			camera->transform->position.z -= 1;
 		}
 	} 
 	// else if (evt.type == SDL_KEYUP) {
@@ -231,6 +240,7 @@ void PlayMode::end_move(){
 	right.pressed = false;
 	down.pressed = false;
 	up.pressed = false;
+	
 	moving = false;
 }
 
@@ -242,13 +252,6 @@ void PlayMode::to_wall(){
 	axisz = glm::vec3(1.0f, 0.0f, 0.0f);
 	if (stance == 0) stance = 2;
 	else if (stance == 2) stance = 0;
-	camera->transform->rotation = glm::angleAxis(
-					glm::radians(-90.0f),
-					axisy
-				) * camera->transform->rotation;
-	camera->transform->position.z -= 5;
-	camera->transform->position.x -= 5;
-	camera_base_position = camera->transform->position;
 }
 
 void PlayMode::to_floor(){
@@ -261,13 +264,6 @@ void PlayMode::to_floor(){
 
 	if (stance == 0) stance = 2;
 	else if (stance == 2) stance = 0;
-	camera->transform->rotation = glm::angleAxis(
-					glm::radians(90.0f),
-					axisy
-				) * camera->transform->rotation;
-	camera->transform->position.z += 5;
-	camera->transform->position.x += 5;
-	camera_base_position = camera->transform->position;
 }
 
 
@@ -302,21 +298,23 @@ bool PlayMode::update(float elapsed) {
 			if (right.pressed) move.x = 1.0f;
 			if (down.pressed) move.y = -1.0f;
 			if (up.pressed) move.y = 1.0f;
-
+			int rot_camera = 0.0f;
 			if (wall){
 				if ((pos1.z == 0 || pos2.z == 0) && left.pressed){
-					to_floor();
-					end_move();
-					return false;
+					move.x = 0.0f;
+					rot_camera = 1.0f;
+					// end_move();
+					// return;
 				}
 			} else {
 				if ((pos1.x == level_map.floor.width-1 || pos2.x == level_map.floor.width-1) && right.pressed){
-					to_wall();
-					end_move();
-					return false;
+					move.x = 0.0f;
+					rot_camera = -1.0f;
+					// end_move();
+					// return;
 				}
 			}
-		
+			
 			newpos = next_pos(pos1, pos2, move);
 			if (offmap(newpos)){ //check map
 				end_move();
@@ -352,59 +350,80 @@ bool PlayMode::update(float elapsed) {
 			// 	move.x = 0;
 			// 	stand = -1.0f;
 			// }
-			if (move.x != 0){
-				player->rotation = glm::angleAxis(
-					glm::radians(drot*move.x),
+			if (rot_camera != 0.0f){
+				camera->transform->rotation = glm::angleAxis(
+					glm::radians(drot*rot_camera),
 					axisy
-				) * player_base_rotation;
-			} else if (move.y != 0){
-				player->rotation = glm::angleAxis(
-					glm::radians(drot*move.y),
-					axisx
-				) * player_base_rotation;
-
-			} else if (move.z != 0){
-				player->rotation = glm::angleAxis(
-					glm::radians(drot*move.z),
-					axisz
-				) * player_base_rotation;
-			}
-			if (stance == 0){
-				move.z = abs(move.x)*0.5;
-				move.x *= 1.5;
-			} else if (stance == 1){
-				move.z = abs(move.y)*0.5;
-				move.y *= 1.5;
-			} else if (stance == 2){
-				move.z = -0.5;
-				move.x *= 1.5;
-				move.y *= 1.5;
-			}
-			
-			
-			player->position = player_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
-			camera->transform->position = camera_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
-			
-			if (abs(dmov) == 1.0f){
-				drot = 0.0f;
-			
-				player_base_position = player->position;
-				camera_base_position = camera->transform->position;
-				player_base_rotation = player->rotation;
-				dmov = 0.0f;
-
-				if (stance == 0){
-					if (move.x != 0) stance = 2;
-				} else if (stance == 1){
-					if (move.y != 0) stance = 2;
-				} else if (stance == 2){
-					if (move.x != 0) stance = 0;
-					else if (move.y != 0) stance = 1;
+				) * camera_base_rotation;
+				camera->transform->position.z = camera_base_position.z + 5.0f * dmov * rot_camera;
+				camera->transform->position.x = camera_base_position.x + 5.0f * dmov * rot_camera;
+				
+				if (dmov == 1.0f){
+					drot = 0;
+					dmov = 0;
+					camera_base_position = camera->transform->position;
+					camera_base_rotation = camera->transform->rotation;
+					if (wall) to_floor();
+					else to_wall();
+					end_move();
 				}
-				pos1 = newpos.first;
-				pos2 = newpos.second;
-				end_move();
+			} else {
+				if (move.x != 0){
+					player->rotation = glm::angleAxis(
+						glm::radians(drot*move.x),
+						axisy
+					) * player_base_rotation;
+				} else if (move.y != 0){
+					player->rotation = glm::angleAxis(
+						glm::radians(drot*move.y),
+						axisx
+					) * player_base_rotation;
+
+				} else if (move.z != 0){
+					player->rotation = glm::angleAxis(
+						glm::radians(drot*move.z),
+						axisz
+					) * player_base_rotation;
+				}
+				if (stance == 0){
+					move.z = abs(move.x)*0.5;
+					move.x *= 1.5;
+				} else if (stance == 1){
+					move.z = abs(move.y)*0.5;
+					move.y *= 1.5;
+				} else if (stance == 2){
+					move.z = -0.5;
+					move.x *= 1.5;
+					move.y *= 1.5;
+				}
+				
+				
+				player->position = player_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
+				camera->transform->position = camera_base_position + dmov * (dirx * move.x + diry * move.y + dirz * move.z);
+				
+				if (abs(dmov) == 1.0f){
+					drot = 0.0f;
+					dmov = 0.0f;
+					player_base_position = player->position;
+					camera_base_position = camera->transform->position;
+					player_base_rotation = player->rotation;
+					
+
+					if (stance == 0){
+						if (move.x != 0) stance = 2;
+					} else if (stance == 1){
+						if (move.y != 0) stance = 2;
+					} else if (stance == 2){
+						if (move.x != 0) stance = 0;
+						else if (move.y != 0) stance = 1;
+					}
+					pos1 = newpos.first;
+					pos2 = newpos.second;
+					end_move();
+				}
 			}
+
+			
 			
 		}
 

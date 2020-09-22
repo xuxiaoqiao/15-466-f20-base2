@@ -33,9 +33,17 @@ struct LevelMap {
         std::vector<int> content;
     };
 
-    LevelMap(const Plane &floor, const std::optional<Plane> &rightWall, const std::vector<std::pair<glm::uvec3, std::string>> &coinsPos)
-            : floor(floor), right_wall(rightWall), coins_pos(coinsPos) {}
+    struct Player {
+        glm::uvec3 pos1;
+        glm::uvec3 pos2;
+        int stance;
+    };
+
+    LevelMap(const Plane &floor, const std::optional<Plane> &rightWall, const std::vector<std::pair<glm::uvec3, std::string>> &coinsPos, const Player &p)
+            : floor(floor), right_wall(rightWall), coins_pos(coinsPos), player(p) {}
     Plane floor;
     std::optional<Plane> right_wall;
     std::vector<std::pair<glm::uvec3, std::string>> coins_pos;
+    Player player;
+
 };
