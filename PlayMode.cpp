@@ -348,14 +348,14 @@ bool PlayMode::update(float elapsed) {
 	}
 	
 	//check if we collect coins
-	for(int i = 0; i<level_map.coins_pos.size();i++){
-		auto pos = collected_coins.find(i);
+	for(size_t i = 0; i<level_map.coins_pos.size();i++){
+		auto pos = collected_coins.find(int(i));
 		if (pos != collected_coins.end()){
 			continue;
 		}
 		if (level_map.coins_pos[i].first ==pos1 || level_map.coins_pos[i].first == pos2){
-			coinFound = i;
-			collected_coins.insert(i);
+			coinFound = int(i);
+			collected_coins.insert(int(i));
 			break;
 		}
 	}
