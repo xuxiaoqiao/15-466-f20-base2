@@ -87,11 +87,11 @@
         "id": "coin1"
       },
       {
-        "position": [6, 6, 0],
+        "position": [6, 6, 1],
         "id": "coin2"
       },
       {
-        "position": [8, 0, 0],
+        "position": [8, 0, 1],
         "id": "coin3"
       },
       {
@@ -99,7 +99,7 @@
         "id": "coin4"
       },
       {
-        "position": [16, 3, 0],
+        "position": [16, 3, 1],
         "id": "coin5"
       },
       {

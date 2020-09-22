@@ -16,5 +16,7 @@ Use W, A, S and D to roll the rectangle to different directions. Collect all the
 
 Sources: N/A.
 
+Credit for coin model: https://kenney.nl/assets/platformer-kit
+
 This game was built with [NEST](NEST.md).
 
