@@ -13,6 +13,7 @@
 #include <random>
 
 
+
 //Load< MeshBuffer > hexapod_meshes(LoadTagDefault, []() -> MeshBuffer const * {
 //	MeshBuffer const *ret = new MeshBuffer(data_path("level1.pnct"));
 //	hexapod_meshes_for_lit_color_texture_program = ret->make_vao_for_program(lit_color_texture_program->program);
@@ -91,6 +92,7 @@ PlayMode::PlayMode(int level_idx) : scene(roller_scene_list->at(level_idx)),
 				"Expecting scene to have exactly one camera, but it has " + std::to_string(scene.cameras.size()));
 	camera = &scene.cameras.front();
 	camera_base_position = camera->transform->position;
+
 }
 
 PlayMode::~PlayMode() {
@@ -164,6 +166,50 @@ bool PlayMode::handle_event(SDL_Event const &evt, glm::uvec2 const &window_size)
 	return false;
 }
 
+std::vector<int> PlayMode::next_pos(std::vector<int> pos, glm::vec3 operation){
+	if (operation.x != 0) operation.x /= abs(operation.x);
+	if (operation.y != 0) operation.y /= abs(operation.y);
+	if (stance == 0){
+		pos[1] -= operation.y;
+		pos[3] -= operation.y;
+		if (operation.x > 0){
+			pos[0] = std::max(pos[0], pos[2]) + 1;
+			pos[2] = pos[0];
+		} else if (operation.x < 0){
+			pos[0] = std::min(pos[0], pos[2]) - 1;
+			pos[2] = pos[0];
+		}
+	} else if (stance == 1){
+		pos[0] += operation.x;
+		pos[2] += operation.x;
+		if (operation.y > 0){
+			pos[1] = std::min(pos[1], pos[3]) - 1;
+			pos[3] = pos[1];
+		} else if (operation.y < 0){
+			pos[1] = std::max(pos[1], pos[3]) + 1;
+			pos[3] = pos[1];
+		}
+	} else if (stance == 2){
+		pos[0] += operation.x;
+		pos[1] -= operation.y;
+		pos[2] += operation.x*2;
+		pos[3] -= operation.y*2;
+	}
+	return pos;
+}
+
+bool PlayMode::offmap(std::vector<int> pos){
+	if (map.floor.GetTileType(pos[1], pos[0]) == 0 || map.floor.GetTileType(pos[3], pos[2]) == 0) return true;
+	return false;
+}
+
+void PlayMode::end_move(){
+	left.pressed = false;
+	right.pressed = false;
+	down.pressed = false;
+	up.pressed = false;
+	moving = false;
+}
 
 void PlayMode::update(float elapsed) {
 
@@ -185,7 +231,7 @@ void PlayMode::update(float elapsed) {
 
 	if (moving){
 
-
+		
 		//move camera:
 		{
 
@@ -196,8 +242,11 @@ void PlayMode::update(float elapsed) {
 			if (!left.pressed && right.pressed) move.x = 1.0f;
 			if (down.pressed && !up.pressed) move.y = -1.0f;
 			if (!down.pressed && up.pressed) move.y = 1.0f;
-
-			
+			newpos = next_pos(pos, move);
+			if (offmap(newpos)){ //check map
+				end_move();
+				return;
+			}
 			//make it so that moving diagonally doesn't go faster:
 			// if (move != glm::vec2(0.0f)) move = glm::normalize(move) * PlayerSpeed * elapsed;
 
@@ -271,16 +320,8 @@ void PlayMode::update(float elapsed) {
 					if (move.x != 0) stance = 0;
 					else if (move.y != 0) stance = 1;
 				}
-				left.pressed = false;
-				right.pressed = false;
-				down.pressed = false;
-				up.pressed = false;
-				
-				move.x = 0.0f;
-				move.y = 0.0f;
-				move.z = 0.0f;
-				
-				moving = false;
+				pos = newpos;
+				end_move();
 			}
 			
 		}
